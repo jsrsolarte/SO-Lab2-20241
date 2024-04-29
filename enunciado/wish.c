@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "bincmds.h"
 #include "utils.h"
+#include <sys/wait.h>
 
 void ejecutar_comando(char *linea_comando)
 {
@@ -15,6 +16,27 @@ void ejecutar_comando(char *linea_comando)
     {
         ejecutar_buildin_cmd(comando, cantidad_palabras);
     }
+    else if (es_path_cmd(comando[0]))
+    {
+        char *comando_path = obtener_comando_en_path(comando[0]);
+
+        int pid = fork();
+        if (pid == 0)
+        {
+            execv(comando_path, comando);
+            // Si execv falla, imprime un mensaje de error y sale
+            imprimir_error();
+        }
+        else if (pid < 0)
+        {
+            imprimir_error();
+        }
+        else
+        {
+            wait(NULL); // Espera a que el proceso hijo termine
+        }
+    }
+
     else
     {
         imprimir_error();

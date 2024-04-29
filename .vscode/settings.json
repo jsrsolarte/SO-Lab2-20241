@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "bincmds.h": "c",
-        "utils.h": "c"
+        "utils.h": "c",
+        "stdio.h": "c"
     }
 }

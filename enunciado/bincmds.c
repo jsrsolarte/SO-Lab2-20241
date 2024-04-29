@@ -56,11 +56,9 @@ void ejecutar_buildin_cmd(char **comando, int palabras_comando)
     {
 
         char **nuevo_path = malloc(sizeof(char *) * (palabras_comando - 1));
-        for (int i = 1; i < palabras_comando; i++)
-        {
-            nuevo_path[i - 1] = malloc(strlen(comando[i]) + 1);
-            strcpy(nuevo_path[i - 1], comando[i]);
-        }
+
+        nuevo_path = seleccionar_argumentos(comando, 1, palabras_comando);
+
         cambiar_path(nuevo_path, palabras_comando - 1);
     }
     else if (strcmp(comando[0], "pathprt") == 0)
