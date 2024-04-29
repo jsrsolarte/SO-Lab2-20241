@@ -1,21 +1,26 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "bincmds.h"
+#include "utils.h"
 
-void imprimir_error()
+void ejecutar_comando(char *linea_comando)
 {
-    fprintf(stderr, "An error has occurred\n");
-}
+    linea_comando = terminar_en_nueva_linea(linea_comando);
 
-void ejecutar_comando(char *comando)
-{
-    if (strcmp(comando, "exit") == 0)
+    int cantidad_palabras;
+    char **comando = dividir_por_espacios(linea_comando, &cantidad_palabras);
+
+    if (es_buildin_cmd(comando[0]))
     {
-        return exit(0);
+        ejecutar_buildin_cmd(comando, cantidad_palabras);
+    }
+    else
+    {
+        imprimir_error();
     }
 
-    // Aquí puedes agregar la lógica para procesar los comandos ingresados
-    imprimir_error();
+    free(comando);
 }
 
 int main(int argc, char *argv[])
@@ -28,7 +33,6 @@ int main(int argc, char *argv[])
         {
             printf("wish> ");
             fgets(input, sizeof(input), stdin);
-            input[strcspn(input, "\n")] = '\0';
 
             ejecutar_comando(input);
         }
@@ -44,8 +48,6 @@ int main(int argc, char *argv[])
         char line[100];
         while (fgets(line, sizeof(line), file))
         {
-            line[strcspn(line, "\n")] = '\0';
-
             ejecutar_comando(line);
         }
 

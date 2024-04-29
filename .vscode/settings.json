@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "bincmds.h": "c",
+        "utils.h": "c"
+    }
+}
