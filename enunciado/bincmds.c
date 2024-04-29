@@ -1,9 +1,8 @@
 #include "bincmds.h"
 #include "utils.h"
+#include "path_utils.h"
 #include <stdbool.h>
 #include <unistd.h>
-
-char *path = "/bin";
 
 bool es_buildin_cmd(char *comando)
 {
@@ -55,74 +54,22 @@ void ejecutar_buildin_cmd(char **comando, int palabras_comando)
     }
     else if (strcmp(comando[0], "path") == 0)
     {
-        // Si solo hay una palabra en el comando, simplemente asignamos esa palabra a path
-        if (palabras_comando == 1)
+
+        char **nuevo_path = malloc(sizeof(char *) * (palabras_comando - 1));
+        for (int i = 1; i < palabras_comando; i++)
         {
-            path = malloc(1);
-            if (path == NULL)
-            {
-                printf("Error: No se pudo asignar memoria.\n");
-                exit(1);
-            }
-            path[0] = '\0';
+            nuevo_path[i - 1] = malloc(strlen(comando[i]) + 1);
+            strcpy(nuevo_path[i - 1], comando[i]);
         }
-        else
-        {
-            // Calculamos el tamaño necesario para la nueva cadena
-            int newSize = 1; // Para el terminador nulo inicial
-
-            // Calculamos el tamaño total de la nueva cadena y el separador ';' entre cada string
-            for (int i = 1; i < palabras_comando; i++)
-            {
-                newSize += strlen(comando[i]) + 1; // +1 para el separador ';'
-            }
-
-            // Si path aún no está asignado, asignamos memoria inicial
-            if (path == NULL)
-            {
-                path = malloc(newSize);
-                if (path == NULL)
-                {
-                    printf("Error: No se pudo asignar memoria.\n");
-                    exit(1);
-                }
-            }
-            else
-            {
-                // Si ya hay memoria asignada, la ajustamos con realloc
-                char *temp = realloc(path, newSize);
-                if (temp == NULL)
-                {
-                    printf("Error: No se pudo asignar memoria.\n");
-                    exit(1);
-                }
-                path = temp;
-            }
-
-            // Inicializamos path
-            path[0] = '\0';
-
-            // Concatenamos cada cadena con ';' excepto la última
-            strcat(path, comando[1]);
-            for (int i = 2; i < palabras_comando; i++)
-            {
-                strcat(path, ";");
-                strcat(path, comando[i]);
-            }
-        }
+        cambiar_path(nuevo_path, palabras_comando - 1);
     }
     else if (strcmp(comando[0], "pathprt") == 0)
     {
-        printf("%s\n", path);
+        imprimir_path();
     }
 
     else
     {
         imprimir_error();
     }
-}
-
-char *obtener_path()
-{
-    return path;
 }
