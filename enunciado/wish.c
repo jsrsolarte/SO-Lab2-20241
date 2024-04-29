@@ -1,5 +1,24 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
+
+void imprimir_error()
+{
+    fprintf(stderr, "An error has occurred\n");
+}
+
+bool ejecutar_comando(char *comando)
+{
+    if (strcmp(comando, "exit") == 0)
+    {
+        return false;
+    }
+
+    // Aquí puedes agregar la lógica para procesar los comandos ingresados
+    imprimir_error();
+    return true;
+}
+
 
 int main(int argc, char *argv[])
 {
@@ -12,13 +31,11 @@ int main(int argc, char *argv[])
             printf("wish> ");
             fgets(input, sizeof(input), stdin);
             input[strcspn(input, "\n")] = '\0';
-            if (strcmp(input, "exit") == 0)
+
+            if (!ejecutar_comando(input))
             {
                 return 0;
             }
-
-            // Aquí puedes agregar la lógica para procesar los comandos ingresados
-            fprintf(stderr, "An error has occurred\n");
         }
     }
     else if (argc == 2)
@@ -26,8 +43,7 @@ int main(int argc, char *argv[])
         FILE *file = fopen(argv[1], "r");
         if (file == NULL)
         {
-            fprintf(stderr, "An error has occurred\n");
-            return 1;
+            imprimir_error();
         }
 
         char line[100];
@@ -35,21 +51,17 @@ int main(int argc, char *argv[])
         {
             line[strcspn(line, "\n")] = '\0';
 
-            if (strcmp(line, "exit") == 0)
+            if (!ejecutar_comando(line))
             {
                 return 0;
             }
-
-            // Aquí puedes agregar la lógica para procesar cada línea del archivo
-            fprintf(stderr, "An error has occurred\n");
         }
 
         fclose(file);
     }
     else
     {
-        fprintf(stderr, "An error has occurred\n");
-        return 1;
+        imprimir_error();
     }
 
     return 0;
