@@ -1,24 +1,22 @@
 #include <stdio.h>
 #include <string.h>
-#include <stdbool.h>
+#include <stdlib.h>
 
 void imprimir_error()
 {
     fprintf(stderr, "An error has occurred\n");
 }
 
-bool ejecutar_comando(char *comando)
+void ejecutar_comando(char *comando)
 {
     if (strcmp(comando, "exit") == 0)
     {
-        return false;
+        return exit(0);
     }
 
     // Aquí puedes agregar la lógica para procesar los comandos ingresados
     imprimir_error();
-    return true;
 }
-
 
 int main(int argc, char *argv[])
 {
@@ -32,10 +30,7 @@ int main(int argc, char *argv[])
             fgets(input, sizeof(input), stdin);
             input[strcspn(input, "\n")] = '\0';
 
-            if (!ejecutar_comando(input))
-            {
-                return 0;
-            }
+            ejecutar_comando(input);
         }
     }
     else if (argc == 2)
@@ -51,10 +46,7 @@ int main(int argc, char *argv[])
         {
             line[strcspn(line, "\n")] = '\0';
 
-            if (!ejecutar_comando(line))
-            {
-                return 0;
-            }
+            ejecutar_comando(line);
         }
 
         fclose(file);
