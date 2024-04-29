@@ -1,4 +1,6 @@
 #include "path_utils.h"
+#include <unistd.h>
+#include <stdbool.h>
 
 Path path = {
     .path = (char *[]){"/bin"},
@@ -17,4 +19,30 @@ void imprimir_path()
     {
         printf("%s\n", path.path[i]);
     }
+}
+
+bool es_path_cmd(char *comando)
+{
+    return obtener_comando_en_path(comando) != NULL;
+}
+
+char *obtener_comando_en_path(const char *comando)
+{
+    // Iterar sobre los directorios en el path
+    for (int i = 0; i < path.length; i++)
+    {
+        size_t ruta_completa_len = strlen(path.path[i]) + strlen(comando) + 2;
+        char ruta_completa[ruta_completa_len];
+        snprintf(ruta_completa, sizeof(ruta_completa), "%s/%s", path.path[i], comando);
+
+        // Verificar si el archivo es accesible
+        if (access(ruta_completa, X_OK) == 0)
+        {
+            char *ruta_completa_copy = malloc(strlen(ruta_completa) + 1);
+            strcpy(ruta_completa_copy, ruta_completa);
+            return ruta_completa_copy;
+        }
+    }
+    // El ejecutable no fue encontrado en ninguna de las rutas del path
+    return NULL;
 }
