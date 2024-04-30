@@ -3,7 +3,7 @@
 #ifndef PTHCMDS_H
 #define PTHCMDS_H
 
-bool existe_comando(char *comando);
+void ejecutar_comando_path(char **comando, int palabras_comando);
 
 #include "pthcmds.c"
 #endif
