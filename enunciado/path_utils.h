@@ -11,13 +11,13 @@ typedef struct
     int length;
 } Path;
 
-bool es_path_cmd(char *comando);
+bool es_path_ejecutable(char *comando);
 
 void imprimir_path();
 
 void cambiar_path(char **nuevo_path, int nuevo_tamanio);
 
-char *obtener_comando_en_path(const char *comando);
+char *obtener_path_ejecutable(const char *comando);
 
 #include "path_utils.c"
 #endif // PATH_UTILS_H

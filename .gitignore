@@ -53,3 +53,4 @@ dkms.conf
 
 **/tests-out/*
 .vscode/launch.json
+output.*

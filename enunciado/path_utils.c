@@ -21,12 +21,12 @@ void imprimir_path()
     }
 }
 
-bool es_path_cmd(char *comando)
+bool es_path_ejecutable(char *comando)
 {
-    return obtener_comando_en_path(comando) != NULL;
+    return obtener_path_ejecutable(comando) != NULL;
 }
 
-char *obtener_comando_en_path(const char *comando)
+char *obtener_path_ejecutable(const char *comando)
 {
     // Iterar sobre los directorios en el path
     for (int i = 0; i < path.length; i++)
