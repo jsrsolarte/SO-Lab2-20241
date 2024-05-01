@@ -6,45 +6,87 @@
 #include "utils.h"   // Incluye los prototipos de funciones utilitarias
 #include "pthcmds.h" // Incluye los prototipos de funciones para comandos externos
 
+void procesar_linea_comandos(char *linea_comando)
+{
+
+    // Eliminar el espacio en blanco al principio y al final de la línea de comando
+    linea_comando = quitar_espacion_blanco(linea_comando);
+
+    if (linea_comando != NULL && strlen(linea_comando) > 0)
+    {
+
+        int cantidad_palabras;
+        // Divide la línea de comando en palabras individuales
+        char **comando = dividir_por_caracter(linea_comando, ' ', &cantidad_palabras);
+
+        // Verifica si el comando es un comando interno
+        if (es_buildin_cmd(comando[0]))
+        {
+            ejecutar_buildin_cmd(comando, cantidad_palabras); // Ejecuta el comando interno
+        }
+        // Verifica si el comando es un ejecutable en la ruta especificada
+        else if (es_path_ejecutable(comando[0]))
+        {
+            ejecutar_comando_path(comando, cantidad_palabras); // Ejecuta el comando externo
+        }
+        else
+        {
+            imprimir_error(); // Imprime un mensaje de error si el comando no es reconocido
+        }
+
+        free(comando); // Libera la memoria asignada para almacenar el comando dividido
+    }
+}
+
 // Función para ejecutar un comando dado
 void ejecutar_comando(char *linea_comando)
 {
-    int cantidad_palabras;
-
     int cantidad_lineas;
     char **lineas_comandos = dividir_por_caracter(linea_comando, '&', &cantidad_lineas);
 
-    for (int i = 0; i < cantidad_lineas; i++)
+    if (cantidad_lineas == 1)
     {
+        procesar_linea_comandos(linea_comando);
+    }
+    else
+    {
+        pid_t *pid_array = malloc(cantidad_lineas * sizeof(pid_t));
 
-        linea_comando = lineas_comandos[i];
-        // Eliminar el espacio en blanco al principio y al final de la línea de comando
-
-        linea_comando = quitar_espacion_blanco(linea_comando);
-
-        if (linea_comando != NULL && strlen(linea_comando) > 0)
+        if (pid_array == NULL)
         {
+            perror("Error en la asignación de memoria");
+            exit(EXIT_FAILURE);
+        }
 
-            // Divide la línea de comando en palabras individuales
-            char **comando = dividir_por_caracter(linea_comando, ' ', &cantidad_palabras);
+        for (int i = 0; i < cantidad_lineas; i++)
+        {
+            pid_t pid = fork(); // Crear un nuevo proceso hijo
 
-            // Verifica si el comando es un comando interno
-            if (es_buildin_cmd(comando[0]))
+            if (pid < 0)
             {
-                ejecutar_buildin_cmd(comando, cantidad_palabras); // Ejecuta el comando interno
+                perror("Error en fork");
+                exit(EXIT_FAILURE);
             }
-            // Verifica si el comando es un ejecutable en la ruta especificada
-            else if (es_path_ejecutable(comando[0]))
+            else if (pid == 0)
             {
-                ejecutar_comando_path(comando, cantidad_palabras); // Ejecuta el comando externo
+                // En el proceso hijo, procesar la línea de comando correspondiente
+                procesar_linea_comandos(lineas_comandos[i]);
+                exit(EXIT_SUCCESS); // Importante: salir del proceso hijo después de ejecutar la línea de comando
             }
             else
             {
-                imprimir_error(); // Imprime un mensaje de error si el comando no es reconocido
+                // En el proceso padre, almacenar el PID del proceso hijo en el array
+                pid_array[i] = pid;
             }
-
-            free(comando); // Libera la memoria asignada para almacenar el comando dividido
         }
+
+        // Esperar a que todos los procesos hijos terminen
+        for (int i = 0; i < cantidad_lineas; i++)
+        {
+            waitpid(pid_array[i], NULL, 0);
+        }
+
+        free(pid_array);
     }
 }
 
