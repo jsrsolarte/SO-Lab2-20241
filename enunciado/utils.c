@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include <unistd.h>
 
-char *terminar_en_nueva_linea(char *str)
+char *quitar_espacion_blanco(char *str)
 {
     char *ptr = strchr(str, '\n');
     if (ptr != NULL)
@@ -27,6 +27,57 @@ char *terminar_en_nueva_linea(char *str)
     }
 
     return str;
+}
+
+char **dividir_por_caracter(char *str, char delimiter, int *count)
+{
+    int i, j, k = 0, len = strlen(str);
+    *count = 0;
+
+    // Contar la cantidad de palabras
+    for (i = 0; i < len; i++)
+    {
+        if (str[i] == delimiter)
+        {
+            (*count)++;
+        }
+    }
+    (*count)++; // Contar la última palabra
+
+    // Reservar memoria para el arreglo de palabras
+    char **words = (char **)malloc((*count + 1) * sizeof(char *));
+    if (words == NULL)
+    {
+        fprintf(stderr, "Error de asignación de memoria\n");
+        exit(1);
+    }
+
+    // Extraer las palabras
+    for (i = 0; i < *count; i++)
+    {
+        // Encontrar la longitud de la palabra
+        for (j = k; j < len && str[j] != delimiter; j++)
+            ;
+        // Reservar memoria para la palabra
+        words[i] = (char *)malloc((j - k + 1) * sizeof(char));
+        if (words[i] == NULL)
+        {
+            fprintf(stderr, "Error de asignación de memoria\n");
+            for (int l = 0; l < i; l++)
+            {
+                free(words[l]); // Liberar la memoria asignada anteriormente
+            }
+            free(words);
+            exit(1);
+        }
+        // Copiar la palabra
+        strncpy(words[i], str + k, j - k);
+        words[i][j - k] = '\0'; // Agregar el carácter nulo al final
+        k = j + 1;              // Avanzar k al siguiente carácter delimitador
+    }
+    words[*count] = NULL; // Establecer el último elemento como NULL
+
+    return words;
 }
 
 char **dividir_por_espacios(char *str, int *count)
