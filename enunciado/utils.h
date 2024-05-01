@@ -3,8 +3,9 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-char *terminar_en_nueva_linea(char *str);
+char *quitar_espacion_blanco(char *str);
 char **dividir_por_espacios(char *str, int *count);
+char **dividir_por_caracter(char *str, char delimiter, int *count);
 void imprimir_error();
 char **dividir_array(char **args, int inicio, int fin);
 char* separar_por_redireccion(char **comandos, int cantidad);

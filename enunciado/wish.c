@@ -11,31 +11,40 @@ void ejecutar_comando(char *linea_comando)
 {
     int cantidad_palabras;
 
-    // Elimina el caracter de nueva línea si está presente al final de la línea de comando
-    linea_comando = terminar_en_nueva_linea(linea_comando);
+    int cantidad_lineas;
+    char **lineas_comandos = dividir_por_caracter(linea_comando, '&', &cantidad_lineas);
 
-    if (linea_comando != NULL && strlen(linea_comando) > 0)
+    for (int i = 0; i < cantidad_lineas; i++)
     {
 
-        // Divide la línea de comando en palabras individuales
-        char **comando = dividir_por_espacios(linea_comando, &cantidad_palabras);
+        linea_comando = lineas_comandos[i];
+        // Eliminar el espacio en blanco al principio y al final de la línea de comando
 
-        // Verifica si el comando es un comando interno
-        if (es_buildin_cmd(comando[0]))
-        {
-            ejecutar_buildin_cmd(comando, cantidad_palabras); // Ejecuta el comando interno
-        }
-        // Verifica si el comando es un ejecutable en la ruta especificada
-        else if (es_path_ejecutable(comando[0]))
-        {
-            ejecutar_comando_path(comando, cantidad_palabras); // Ejecuta el comando externo
-        }
-        else
-        {
-            imprimir_error(); // Imprime un mensaje de error si el comando no es reconocido
-        }
+        linea_comando = quitar_espacion_blanco(linea_comando);
 
-        free(comando); // Libera la memoria asignada para almacenar el comando dividido
+        if (linea_comando != NULL && strlen(linea_comando) > 0)
+        {
+
+            // Divide la línea de comando en palabras individuales
+            char **comando = dividir_por_caracter(linea_comando, ' ', &cantidad_palabras);
+
+            // Verifica si el comando es un comando interno
+            if (es_buildin_cmd(comando[0]))
+            {
+                ejecutar_buildin_cmd(comando, cantidad_palabras); // Ejecuta el comando interno
+            }
+            // Verifica si el comando es un ejecutable en la ruta especificada
+            else if (es_path_ejecutable(comando[0]))
+            {
+                ejecutar_comando_path(comando, cantidad_palabras); // Ejecuta el comando externo
+            }
+            else
+            {
+                imprimir_error(); // Imprime un mensaje de error si el comando no es reconocido
+            }
+
+            free(comando); // Libera la memoria asignada para almacenar el comando dividido
+        }
     }
 }
 
